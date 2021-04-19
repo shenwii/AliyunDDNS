@@ -1,0 +1,8 @@
+{
+    "regionId": "cn-huadong",
+    "accessKeyId": "your-access-key-id",
+    "accessKeySecret": "your-access-key-secret",
+    "domainName": "domain.com",
+    "hostRecord": "home",
+    "period": 60000
+}
