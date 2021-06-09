@@ -4,7 +4,6 @@ import com.aliyun.alidns20150109.Client;
 import com.aliyun.alidns20150109.models.*;
 import com.aliyun.tea.TeaModel;
 import com.aliyun.teaopenapi.models.Config;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.Inet6Address;
@@ -21,8 +20,8 @@ public class DDnsClient {
     private final Client client;
     private final int AF_INET = 2;
     private final int AF_INET6 = 10;
-    private String domainName;
-    private String hostRecord;
+    final private String domainName;
+    final private String hostRecord;
 
     public DDnsClient(String accessKeyId, String accessKeySecret, String regionId, String domainName, String hostRecord) throws Exception {
         Config config = new Config();
@@ -51,7 +50,6 @@ public class DDnsClient {
     }
 
     private String getCurrentIpAddress(int family) {
-        ObjectMapper objectMapper = new ObjectMapper();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(family == AF_INET? "https://api.ipify.org?format=text": "https://api64.ipify.org?format=text"))
                 .GET().build();
@@ -59,13 +57,13 @@ public class DDnsClient {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if(response.statusCode() == 200) {
-                String ipAddrStr = response.body();
+                String ipAddressStr = response.body();
                 if(family == AF_INET6) {
-                    if(InetAddress.getByName(ipAddrStr) instanceof Inet6Address)
-                        return ipAddrStr;
+                    if(InetAddress.getByName(ipAddressStr) instanceof Inet6Address)
+                        return ipAddressStr;
                     return null;
                 }
-                return ipAddrStr;
+                return ipAddressStr;
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -74,7 +72,7 @@ public class DDnsClient {
         return null;
     }
 
-    private void insertDnsRecord(String ipAddrStr, int family) throws Exception {
+    private void insertDnsRecord(String ipAddressStr, int family) throws Exception {
         AddDomainRecordRequest request = new AddDomainRecordRequest();
         request.domainName = domainName;
         request.RR = hostRecord;
@@ -82,27 +80,25 @@ public class DDnsClient {
             request.type = "A";
         else
             request.type = "AAAA";
-        request.value = ipAddrStr;
+        request.value = ipAddressStr;
         AddDomainRecordResponse response = client.addDomainRecord(request);
         if (com.aliyun.teautil.Common.isUnset(TeaModel.buildMap(response))) {
             System.err.println("插入记录失败");
-            return;
         }
     }
 
-    private void updateDnsRecord(String recordId, String ipAddrStr, int family) throws Exception {
+    private void updateDnsRecord(String recordId, String ipAddressStr, int family) throws Exception {
         UpdateDomainRecordRequest request = new UpdateDomainRecordRequest();
         request.RR = hostRecord;
         if(family == AF_INET)
             request.type = "A";
         else
             request.type = "AAAA";
-        request.value = ipAddrStr;
+        request.value = ipAddressStr;
         request.recordId = recordId;
         UpdateDomainRecordResponse response = client.updateDomainRecord(request);
         if (com.aliyun.teautil.Common.isUnset(TeaModel.buildMap(response))) {
             System.err.println("更新记录失败");
-            return;
         }
     }
 
@@ -111,29 +107,29 @@ public class DDnsClient {
         DnsRecordDto ipv6DnsRecordDto = getDnsRecordIpAddress(domainName, hostRecord, AF_INET6);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         System.out.println(sdf.format(new Date()) + "\t开始任务");
-        String curIpv4Addr = getCurrentIpAddress(AF_INET);
-        if(curIpv4Addr != null) {
+        String curIpv4Address = getCurrentIpAddress(AF_INET);
+        if(curIpv4Address != null) {
             if(ipv4DnsRecordDto == null) {
                 System.out.println(sdf.format(new Date()) + "\t插入IPv4记录");
-                insertDnsRecord(curIpv4Addr, AF_INET);
+                insertDnsRecord(curIpv4Address, AF_INET);
             } else {
-                if(!curIpv4Addr.equals(ipv4DnsRecordDto.getIpAddress()))
+                if(!curIpv4Address.equals(ipv4DnsRecordDto.getIpAddress()))
                 {
                     System.out.println(sdf.format(new Date()) + "\t更新IPv4记录");
-                    updateDnsRecord(ipv4DnsRecordDto.getRecordId(), curIpv4Addr, AF_INET);
+                    updateDnsRecord(ipv4DnsRecordDto.getRecordId(), curIpv4Address, AF_INET);
                 }
             }
         }
-        String curIpv6Addr = getCurrentIpAddress(AF_INET6);
-        if(curIpv6Addr != null) {
+        String curIpv6Address = getCurrentIpAddress(AF_INET6);
+        if(curIpv6Address != null) {
             if(ipv6DnsRecordDto == null) {
                 System.out.println(sdf.format(new Date()) + "\t插入IPv6记录");
-                insertDnsRecord(curIpv6Addr, AF_INET6);
+                insertDnsRecord(curIpv6Address, AF_INET6);
             } else {
-                if(!curIpv6Addr.equals(ipv6DnsRecordDto.getIpAddress()))
+                if(!curIpv6Address.equals(ipv6DnsRecordDto.getIpAddress()))
                 {
                     System.out.println(sdf.format(new Date()) + "\t更新IPv6记录");
-                    updateDnsRecord(ipv6DnsRecordDto.getRecordId(), curIpv6Addr, AF_INET6);
+                    updateDnsRecord(ipv6DnsRecordDto.getRecordId(), curIpv6Address, AF_INET6);
                 }
             }
         }
@@ -142,8 +138,8 @@ public class DDnsClient {
 }
 
 class DnsRecordDto {
-    private String recordId;
-    private String ipAddress;
+    final private String recordId;
+    final private String ipAddress;
 
     public DnsRecordDto(String recordId, String ipAddress) {
         this.recordId = recordId;
@@ -154,15 +150,7 @@ class DnsRecordDto {
         return recordId;
     }
 
-    public void setRecordId(String recordId) {
-        this.recordId = recordId;
-    }
-
     public String getIpAddress() {
         return ipAddress;
-    }
-
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
     }
 }

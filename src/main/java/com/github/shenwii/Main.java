@@ -2,8 +2,6 @@ package com.github.shenwii;
 
 import com.aliyun.tea.utils.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +13,7 @@ import java.util.TimerTask;
  * @author shenwii
  */
 public class Main {
-    public static void main(String argv[]) throws Exception {
+    public static void main(String[] argv) throws Exception {
         String configPath = null;
         for(int i = 0; i < argv.length; i++) {
             if(argv[i].equals("-c")) {
@@ -78,7 +76,7 @@ public class Main {
     }
 
     private static ConfigDto readConfigFile(String filePath) throws IOException {
-        try(InputStream is = new FileInputStream(new File(filePath))) {
+        try(InputStream is = new FileInputStream(filePath)) {
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(is, ConfigDto.class);
         }
