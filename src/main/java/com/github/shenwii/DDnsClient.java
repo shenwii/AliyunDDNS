@@ -19,8 +19,6 @@ import java.util.Date;
 public class DDnsClient {
 
     private final Client client;
-    private DnsRecordDto ipv4DnsRecordDto = null;
-    private DnsRecordDto ipv6DnsRecordDto = null;
     private final int AF_INET = 2;
     private final int AF_INET6 = 10;
     private String domainName;
@@ -34,8 +32,6 @@ public class DDnsClient {
         this.domainName = domainName;
         this.hostRecord = hostRecord;
         client = new Client(config);
-        ipv4DnsRecordDto = getDnsRecordIpAddress(domainName, hostRecord, AF_INET);
-        ipv6DnsRecordDto = getDnsRecordIpAddress(domainName, hostRecord, AF_INET6);
     }
 
     private DnsRecordDto getDnsRecordIpAddress(String domainName, String hostRecord, int family) throws Exception {
@@ -78,7 +74,7 @@ public class DDnsClient {
         return null;
     }
 
-    private DnsRecordDto insertDnsRecord(String ipAddrStr, int family) throws Exception {
+    private void insertDnsRecord(String ipAddrStr, int family) throws Exception {
         AddDomainRecordRequest request = new AddDomainRecordRequest();
         request.domainName = domainName;
         request.RR = hostRecord;
@@ -90,12 +86,11 @@ public class DDnsClient {
         AddDomainRecordResponse response = client.addDomainRecord(request);
         if (com.aliyun.teautil.Common.isUnset(TeaModel.buildMap(response))) {
             System.err.println("插入记录失败");
-            return null;
+            return;
         }
-        return new DnsRecordDto(response.body.recordId, ipAddrStr);
     }
 
-    private void updateDnsRecord(DnsRecordDto dnsRecordDto, String ipAddrStr, int family) throws Exception {
+    private void updateDnsRecord(String recordId, String ipAddrStr, int family) throws Exception {
         UpdateDomainRecordRequest request = new UpdateDomainRecordRequest();
         request.RR = hostRecord;
         if(family == AF_INET)
@@ -103,28 +98,29 @@ public class DDnsClient {
         else
             request.type = "AAAA";
         request.value = ipAddrStr;
-        request.recordId = dnsRecordDto.getRecordId();
+        request.recordId = recordId;
         UpdateDomainRecordResponse response = client.updateDomainRecord(request);
         if (com.aliyun.teautil.Common.isUnset(TeaModel.buildMap(response))) {
             System.err.println("更新记录失败");
-        } else {
-            dnsRecordDto.setIpAddress(ipAddrStr);
+            return;
         }
     }
 
     public void updateDomain() throws Exception {
+        DnsRecordDto ipv4DnsRecordDto = getDnsRecordIpAddress(domainName, hostRecord, AF_INET);
+        DnsRecordDto ipv6DnsRecordDto = getDnsRecordIpAddress(domainName, hostRecord, AF_INET6);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         System.out.println(sdf.format(new Date()) + "\t开始任务");
         String curIpv4Addr = getCurrentIpAddress(AF_INET);
         if(curIpv4Addr != null) {
             if(ipv4DnsRecordDto == null) {
                 System.out.println(sdf.format(new Date()) + "\t插入IPv4记录");
-                ipv4DnsRecordDto = insertDnsRecord(curIpv4Addr, AF_INET);
+                insertDnsRecord(curIpv4Addr, AF_INET);
             } else {
                 if(!curIpv4Addr.equals(ipv4DnsRecordDto.getIpAddress()))
                 {
                     System.out.println(sdf.format(new Date()) + "\t更新IPv4记录");
-                    updateDnsRecord(ipv4DnsRecordDto, curIpv4Addr, AF_INET);
+                    updateDnsRecord(ipv4DnsRecordDto.getRecordId(), curIpv4Addr, AF_INET);
                 }
             }
         }
@@ -132,12 +128,12 @@ public class DDnsClient {
         if(curIpv6Addr != null) {
             if(ipv6DnsRecordDto == null) {
                 System.out.println(sdf.format(new Date()) + "\t插入IPv6记录");
-                ipv6DnsRecordDto = insertDnsRecord(curIpv6Addr, AF_INET6);
+                insertDnsRecord(curIpv6Addr, AF_INET6);
             } else {
                 if(!curIpv6Addr.equals(ipv6DnsRecordDto.getIpAddress()))
                 {
                     System.out.println(sdf.format(new Date()) + "\t更新IPv6记录");
-                    updateDnsRecord(ipv6DnsRecordDto, curIpv6Addr, AF_INET6);
+                    updateDnsRecord(ipv6DnsRecordDto.getRecordId(), curIpv6Addr, AF_INET6);
                 }
             }
         }
@@ -148,9 +144,6 @@ public class DDnsClient {
 class DnsRecordDto {
     private String recordId;
     private String ipAddress;
-
-    public DnsRecordDto() {
-    }
 
     public DnsRecordDto(String recordId, String ipAddress) {
         this.recordId = recordId;

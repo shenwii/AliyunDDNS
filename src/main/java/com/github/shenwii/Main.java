@@ -57,18 +57,18 @@ public class Main {
             System.err.println("HostRecord不能为空");
             System.exit(1);
         }
-        final DDnsClient client = new DDnsClient(
-                configDto.getAccessKeyId()
-                ,configDto.getAccessKeySecret()
-                ,configDto.getRegionId()
-                ,configDto.getDomainName()
-                ,configDto.getHostRecord()
-                );
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 try {
+                    final DDnsClient client = new DDnsClient(
+                            configDto.getAccessKeyId()
+                            ,configDto.getAccessKeySecret()
+                            ,configDto.getRegionId()
+                            ,configDto.getDomainName()
+                            ,configDto.getHostRecord()
+                    );
                     client.updateDomain();
                 } catch (Exception e) {
                     e.printStackTrace();
