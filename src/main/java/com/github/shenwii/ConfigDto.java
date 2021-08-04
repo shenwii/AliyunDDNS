@@ -15,8 +15,6 @@ public class ConfigDto {
     private String domainName = null;
     /** 主机记录 */
     private String hostRecord = null;
-    /** 执行间隔 */
-    private Long period = 60000L;
 
     public String getRegionId() {
         return regionId;
@@ -56,13 +54,5 @@ public class ConfigDto {
 
     public void setHostRecord(String hostRecord) {
         this.hostRecord = hostRecord;
-    }
-
-    public Long getPeriod() {
-        return period;
-    }
-
-    public void setPeriod(Long period) {
-        this.period = period;
     }
 }

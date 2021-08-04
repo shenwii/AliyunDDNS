@@ -27,7 +27,7 @@
     <orderEntry type="library" name="Maven: com.aliyun:credentials-java:0.2.4" level="project" />
     <orderEntry type="library" name="Maven: org.ini4j:ini4j:0.5.4" level="project" />
     <orderEntry type="library" name="Maven: com.aliyun:endpoint-util:0.0.6" level="project" />
-    <orderEntry type="library" name="Maven: com.aliyun:tea:1.1.9" level="project" />
+    <orderEntry type="library" name="Maven: com.aliyun:tea:1.1.11" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.8.1" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.13.0" level="project" />
     <orderEntry type="library" name="Maven: org.jacoco:org.jacoco.agent:runtime:0.8.4" level="project" />
