@@ -30,8 +30,8 @@ public class DDnsClient {
         config.accessKeyId = accessKeyId;
         config.accessKeySecret = accessKeySecret;
         config.regionId = regionId;
-        config.connectTimeout = TIMEOUT;
-        config.readTimeout = TIMEOUT;
+        config.connectTimeout = TIMEOUT * 1000;
+        config.readTimeout = TIMEOUT * 1000;
         this.domainName = domainName;
         this.hostRecord = hostRecord;
         client = new Client(config);
