@@ -13,6 +13,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 
 public class DDnsClient {
@@ -20,6 +21,7 @@ public class DDnsClient {
     private final Client client;
     private final int AF_INET = 2;
     private final int AF_INET6 = 10;
+    private final int TIMEOUT = 60;
     final private String domainName;
     final private String hostRecord;
 
@@ -28,6 +30,8 @@ public class DDnsClient {
         config.accessKeyId = accessKeyId;
         config.accessKeySecret = accessKeySecret;
         config.regionId = regionId;
+        config.connectTimeout = TIMEOUT;
+        config.readTimeout = TIMEOUT;
         this.domainName = domainName;
         this.hostRecord = hostRecord;
         client = new Client(config);
@@ -52,8 +56,11 @@ public class DDnsClient {
     private String getCurrentIpAddress(int family) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(family == AF_INET? "https://api.ipify.org?format=text": "https://api64.ipify.org?format=text"))
-                .GET().build();
-        HttpClient client = HttpClient.newHttpClient();
+                .GET()
+                .build();
+        HttpClient client = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(TIMEOUT))
+                .build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if(response.statusCode() == 200) {
