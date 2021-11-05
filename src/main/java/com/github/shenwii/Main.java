@@ -107,7 +107,7 @@ public class Main {
      * 打印使用方法
      */
     public static void showUsage() {
-        System.err.print("Usage: TcpForward [OPTION]\n" +
+        System.err.print("Usage: AliyunDDNS      [OPTION]\n" +
                 "  -c, --config config_file      Config file path\n" +
                 "  -r, --region region_id        Region Id\n" +
                 "  -i, --key-id key_id           Access Key Id\n" +
