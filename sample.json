@@ -4,5 +4,5 @@
     "accessKeySecret": "your-access-key-secret",
     "domainName": "domain.com",
     "hostRecord": "home",
-    "period": 60000
+    "timeout": 60
 }

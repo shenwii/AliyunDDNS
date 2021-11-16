@@ -58,6 +58,15 @@ public class Main {
                     }
                     configDto.setHostRecord(argv[i]);
                     break;
+                case "-o":
+                case "--timeout":
+                    if (++i >= argv.length) {
+                        showUsage();
+                    }
+                    try {
+                        configDto.setTimeout(Integer.valueOf(argv[i]));
+                    } catch (NumberFormatException ignore) {}
+                    break;
                 case "-h":
                 case "--help":
                 default:
@@ -91,6 +100,7 @@ public class Main {
                 ,configDto.getRegionId()
                 ,configDto.getDomainName()
                 ,configDto.getHostRecord()
+                ,configDto.getTimeout()
         );
         client.updateDomain();
     }

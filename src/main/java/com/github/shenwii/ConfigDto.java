@@ -15,6 +15,8 @@ public class ConfigDto {
     private String domainName = null;
     /** 主机记录 */
     private String hostRecord = null;
+    /** 超时 */
+    private Integer timeout = 60;
 
     public String getRegionId() {
         return regionId;
@@ -54,5 +56,13 @@ public class ConfigDto {
 
     public void setHostRecord(String hostRecord) {
         this.hostRecord = hostRecord;
+    }
+
+    public Integer getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(Integer timeout) {
+        this.timeout = timeout;
     }
 }
