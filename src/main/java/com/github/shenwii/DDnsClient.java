@@ -28,8 +28,15 @@ public class DDnsClient {
     final private String domainName;
     final private String hostRecord;
     final private int timeout;
+    final private boolean useIpv6;
 
-    public DDnsClient(String accessKeyId, String accessKeySecret, String regionId, String domainName, String hostRecord, int timeout) throws Exception {
+    public DDnsClient(String accessKeyId
+            , String accessKeySecret
+            , String regionId
+            , String domainName
+            , String hostRecord
+            , int timeout
+            , boolean useIpv6) throws Exception {
         Config config = new Config();
         config.accessKeyId = accessKeyId;
         config.accessKeySecret = accessKeySecret;
@@ -39,6 +46,7 @@ public class DDnsClient {
         this.domainName = domainName;
         this.hostRecord = hostRecord;
         this.timeout = timeout;
+        this.useIpv6 = useIpv6;
         client = new Client(config);
     }
 
@@ -153,27 +161,30 @@ public class DDnsClient {
             System.err.println(sdf.format(new Date()) + "\t获取IPv4地址失败");
             System.err.println(sdf.format(new Date()) + "\t可能是你并未联网");
         }
-        System.out.println(sdf.format(new Date()) + "\t获取IPv6地址");
-        String curIpv6Address = getCurrentIpAddress(AF_INET6);
-        if(!StringUtils.isEmpty(curIpv6Address)) {
-            System.out.println(sdf.format(new Date()) + "\t当前IPv6地址为：" + curIpv6Address);
-            if(ipv6DnsRecordDto == null) {
-                System.out.println(sdf.format(new Date()) + "\t阿里云并不存在这条记录");
-                System.out.println(sdf.format(new Date()) + "\t插入IPv6记录");
-                insertDnsRecord(curIpv6Address, AF_INET6);
-            } else {
-                System.out.println(sdf.format(new Date()) + "\t当前阿里云记录为：" + ipv6DnsRecordDto.getIpAddress());
-                if(!curIpv6Address.equals(ipv6DnsRecordDto.getIpAddress())) {
-                    System.out.println(sdf.format(new Date()) + "\t记录不同，更新IPv6记录");
-                    updateDnsRecord(ipv6DnsRecordDto.getRecordId(), curIpv6Address, AF_INET6);
+        if(useIpv6)
+        {
+            System.out.println(sdf.format(new Date()) + "\t获取IPv6地址");
+            String curIpv6Address = getCurrentIpAddress(AF_INET6);
+            if(!StringUtils.isEmpty(curIpv6Address)) {
+                System.out.println(sdf.format(new Date()) + "\t当前IPv6地址为：" + curIpv6Address);
+                if(ipv6DnsRecordDto == null) {
+                    System.out.println(sdf.format(new Date()) + "\t阿里云并不存在这条记录");
+                    System.out.println(sdf.format(new Date()) + "\t插入IPv6记录");
+                    insertDnsRecord(curIpv6Address, AF_INET6);
                 } else {
-                    System.out.println(sdf.format(new Date()) + "\t记录相同不需要更新");
+                    System.out.println(sdf.format(new Date()) + "\t当前阿里云记录为：" + ipv6DnsRecordDto.getIpAddress());
+                    if(!curIpv6Address.equals(ipv6DnsRecordDto.getIpAddress())) {
+                        System.out.println(sdf.format(new Date()) + "\t记录不同，更新IPv6记录");
+                        updateDnsRecord(ipv6DnsRecordDto.getRecordId(), curIpv6Address, AF_INET6);
+                    } else {
+                        System.out.println(sdf.format(new Date()) + "\t记录相同不需要更新");
+                    }
                 }
+            } else {
+                System.err.println(sdf.format(new Date()) + "\t获取IPv6地址失败");
+                System.err.println(sdf.format(new Date()) + "\t可能是你并未联网");
+                System.err.println(sdf.format(new Date()) + "\t也可能是你的网络环境并不支持IPv6");
             }
-        } else {
-            System.err.println(sdf.format(new Date()) + "\t获取IPv6地址失败");
-            System.err.println(sdf.format(new Date()) + "\t可能是你并未联网");
-            System.err.println(sdf.format(new Date()) + "\t也可能是你的网络环境并不支持IPv6");
         }
         System.out.println(sdf.format(new Date()) + "\t结束任务");
     }

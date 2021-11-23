@@ -101,6 +101,7 @@ public class Main {
                 ,configDto.getDomainName()
                 ,configDto.getHostRecord()
                 ,configDto.getTimeout()
+                ,configDto.getUseIpv6()
         );
         client.updateDomain();
     }

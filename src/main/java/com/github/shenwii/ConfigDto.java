@@ -17,6 +17,8 @@ public class ConfigDto {
     private String hostRecord = null;
     /** 超时 */
     private Integer timeout = 60;
+    /** 是否使用IPv6 */
+    private Boolean useIpv6 = true;
 
     public String getRegionId() {
         return regionId;
@@ -64,5 +66,13 @@ public class ConfigDto {
 
     public void setTimeout(Integer timeout) {
         this.timeout = timeout;
+    }
+
+    public Boolean getUseIpv6() {
+        return useIpv6;
+    }
+
+    public void setUseIpv6(Boolean useIpv6) {
+        this.useIpv6 = useIpv6;
     }
 }
